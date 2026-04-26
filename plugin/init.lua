@@ -27,47 +27,47 @@ end
 
 
 function M.setup()
-    local last_seen = (function()
-      local initial = {}
-      for _, name in ipairs(wezterm.mux.get_workspace_names()) do
-        initial[name] = true
-      end
+  local last_seen = (function()
+    local initial = {}
+    for _, name in ipairs(wezterm.mux.get_workspace_names()) do
+      initial[name] = true
+    end
     return initial
-    end)()
+  end)()
 
-    local last_workspace = nil
-    wezterm.on("update-status", function(window, pane)
-      local current_workspace = window:active_workspace()
+  local last_workspace = nil
+  wezterm.on("update-status", function(window, pane)
+    local current_workspace = window:active_workspace()
 
-      if current_workspace ~= last_workspace then
-        last_workspace = current_workspace
+    if current_workspace ~= last_workspace then
+      last_workspace = current_workspace
 
-        local seen = wezterm.mux.get_workspace_names()
-        local added, removed, updated_set = M.diff_workspaces(seen, last_seen)
+      local seen = wezterm.mux.get_workspace_names()
+      local added, removed, updated_set = M.diff_workspaces(seen, last_seen)
 
-        if #added > 0 or #removed > 0 then
-          wezterm.emit("workspace-changed", {
-            added = added,
-            removed = removed,
-            current = seen,
-          })
-        end
-
-        if #added > 0 then
-          wezterm.emit("workspace-added", {
-            added = added,
-            current = seen,
-          })
-        end
-        if #removed > 0 then
-          wezterm.emit("workspace-removed", {
-            removed = removed,
-            current = seen,
-          })
-        end
-        last_seen = updated_set
+      if #added > 0 or #removed > 0 then
+        wezterm.emit("workspace-changed", {
+          added = added,
+          removed = removed,
+          current = seen,
+        })
       end
-    end)
+
+      if #added > 0 then
+        wezterm.emit("workspace-added", {
+          added = added,
+          current = seen,
+        })
+      end
+      if #removed > 0 then
+        wezterm.emit("workspace-removed", {
+          removed = removed,
+          current = seen,
+        })
+      end
+      last_seen = updated_set
+    end
+  end)
 end
 
 return M
