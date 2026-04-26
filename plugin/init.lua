@@ -46,9 +46,25 @@ function M.setup()
         local added, removed, updated_set = M.diff_workspaces(seen, last_seen)
 
         if #added > 0 or #removed > 0 then
-          wezterm.emit("workspace-changed", added)
+          wezterm.emit("workspace-changed", {
+            added = added,
+            removed = removed,
+            current = seen,
+          })
         end
 
+        if #added > 0 then
+          wezterm.emit("workspace-added", {
+            added = added,
+            current = seen,
+          })
+        end
+        if #removed > 0 then
+          wezterm.emit("workspace-removed", {
+            removed = removed,
+            current = seen,
+          })
+        end
         last_seen = updated_set
       end
     end)
